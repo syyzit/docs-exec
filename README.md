@@ -6,10 +6,11 @@ Thin CLI/CI tool. Not an orchestrator. No stage-signal inside this repo (orchest
 
 ## Install
 
-Requires Python 3.11+.
+Requires Python 3.11+ and pip 21.3+ with setuptools 64+ (PEP 660 editable installs) — upgrade first on fresh venvs.
 
 ```console
-pip install -e .
+python -m pip install --upgrade pip setuptools
+pip install -e ".[dev]"
 docs-exec --help
 ```
 
@@ -137,6 +138,7 @@ mixed-result behavior; CI dogfoods `list` plus a passing-only run.
 ## Development
 
 ```console
+python -m pip install --upgrade pip setuptools
 pip install -e ".[dev]"
 pytest
 ```
