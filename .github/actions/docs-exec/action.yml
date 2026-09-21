@@ -1,0 +1,71 @@
+name: 'docs-exec'
+description: 'Run fenced bash/sh/shell blocks from markdown documentation as tests'
+author: 'syyzit'
+branding:
+  icon: 'terminal'
+  color: 'green'
+
+inputs:
+  paths:
+    description: 'Markdown files, directories, or globs to test (space or newline separated). Default: auto-discover all markdown files.'
+    required: false
+    default: ''
+  fail-fast:
+    description: 'Stop execution immediately on the first failing file (default: false).'
+    required: false
+    default: 'false'
+  python-version:
+    description: "Python version to set up (default: '3.11'). Set to empty string '' to skip python setup."
+    required: false
+    default: '3.11'
+  timeout:
+    description: 'Per-block timeout in seconds (default: 60).'
+    required: false
+    default: '60'
+  lang:
+    description: 'Filter languages to execute, e.g. "bash" or "bash,sh" (default: bash, sh, shell).'
+    required: false
+    default: ''
+  fail-on-error:
+    description: 'Whether to fail the step if any block fails (default: true).'
+    required: false
+    default: 'true'
+
+outputs:
+  passed:
+    description: 'Total number of passed blocks'
+    value: ${{ steps.run-docs-exec.outputs.passed }}
+  failed:
+    description: 'Total number of failed blocks'
+    value: ${{ steps.run-docs-exec.outputs.failed }}
+  skipped:
+    description: 'Total number of skipped blocks'
+    value: ${{ steps.run-docs-exec.outputs.skipped }}
+  total:
+    description: 'Total number of blocks evaluated'
+    value: ${{ steps.run-docs-exec.outputs.total }}
+  exit-code:
+    description: 'Exit code from docs-exec'
+    value: ${{ steps.run-docs-exec.outputs.exit-code }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Python
+      if: ${{ inputs.python-version != '' }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Run docs-exec
+      id: run-docs-exec
+      shell: bash
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        INPUT_PATHS: ${{ inputs.paths }}
+        INPUT_FAIL_FAST: ${{ inputs.fail-fast }}
+        INPUT_TIMEOUT: ${{ inputs.timeout }}
+        INPUT_LANG: ${{ inputs.lang }}
+        INPUT_FAIL_ON_ERROR: ${{ inputs.fail-on-error }}
+      run: |
+        python3 "${{ github.action_path }}/run.py"
