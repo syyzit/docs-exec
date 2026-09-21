@@ -45,6 +45,57 @@ With no `--files` (and no positional files), `docs-exec` discovers `**/*.md`
 under the current directory, excluding hidden dirs, `.git`, `.venv`/`venv`,
 `node_modules`, and similar.
 
+## GitHub Action
+
+Run `docs-exec` as a composite GitHub Action in CI to test markdown code blocks:
+
+```yaml
+name: docs-test
+on: [push, pull_request]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: syyzit/docs-exec/.github/actions/docs-exec@main
+        with:
+          paths: README.md
+```
+
+### Action inputs
+
+| Input | Description | Default |
+|-------|-------------|---------|
+| `paths` | Markdown files, directories, or globs to test (space or newline separated). If omitted, discovers all `**/*.md`. | `""` |
+| `fail-fast` | If `true`, stops immediately on the first failing file. | `false` |
+| `python-version` | Python version to set up via `actions/setup-python` (set to `""` to use runner's ambient Python). | `'3.11'` |
+| `timeout` | Per-block timeout in seconds (`0` disables timeout). | `60` |
+| `lang` | Filter languages to run (e.g. `bash`, `sh`, or `bash,sh`). | `""` (all supported) |
+| `fail-on-error` | Exit with a non-zero code if any block fails. Set to `false` for audit/reporting runs. | `true` |
+
+### Action outputs
+
+| Output | Description |
+|--------|-------------|
+| `passed` | Total number of passed blocks |
+| `failed` | Total number of failed blocks |
+| `skipped` | Total number of skipped blocks |
+| `total` | Total number of evaluated blocks |
+| `exit-code` | Exit code from `docs-exec` (`0`, `10`, `1`, or `2`) |
+
+### Multi-path and fail-fast example
+
+```yaml
+- uses: syyzit/docs-exec/.github/actions/docs-exec@main
+  with:
+    paths: |
+      README.md
+      docs/
+      examples/
+    fail-fast: true
+```
+
 ## Exit codes
 
 | Code | Meaning |

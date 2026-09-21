@@ -1,0 +1,33 @@
+name: docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  docs-exec:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run docs-exec on README.md
+        uses: ./.github/actions/docs-exec
+        with:
+          paths: README.md
+
+      - name: Run docs-exec on examples/ (mixed / expected failure demo)
+        uses: ./.github/actions/docs-exec
+        with:
+          paths: examples/
+          fail-on-error: false
+
+      - name: Run docs-exec on README.md and examples/ with fail-fast
+        uses: ./.github/actions/docs-exec
+        continue-on-error: true
+        with:
+          paths: |
+            README.md
+            examples/
+          fail-fast: true
