@@ -7,3 +7,7 @@ venv/
 dist/
 build/
 *.egg-info/
+
+.agloop/
+.stage-signal/
+.venv/
