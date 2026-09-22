@@ -135,6 +135,16 @@ See [examples/sample.md](examples/sample.md) — it has passing, failing
 exits `10`), skipped, and non-bash blocks. Tests assert the
 mixed-result behavior; CI dogfoods `list` plus a passing-only run.
 
+## Dogfood
+
+External check against another repo's markdown (a `stage-signal`
+checkout: `README.md` + `docs/**/*.md`): `list` found 22 blocks,
+`run` exited `10` with 6 passed / 16 failed / 0 skipped — every
+failure traced to the target blocks assuming a live repo checkout
+(venv, `.git`, initialized tool state, `dist/` artifacts), which the
+per-block temp dir intentionally does not provide. Details:
+[docs/DOGFOOD.md](docs/DOGFOOD.md).
+
 ## Development
 
 ```console
