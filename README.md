@@ -14,6 +14,8 @@ pip install -e ".[dev]"
 docs-exec --help
 ```
 
+Once published, `pip install docs-exec` will work; until then the editable install above is the way to install.
+
 ## Try it
 
 This block is live — `docs-exec run` executes it in a temp dir:
@@ -96,6 +98,9 @@ jobs:
       examples/
     fail-fast: true
 ```
+
+> After the first tag, pin consumers to `@v0.1.0` (or moving major `@v0`)
+> instead of floating `@main` forever.
 
 ## Exit codes
 

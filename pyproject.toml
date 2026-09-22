@@ -29,6 +29,7 @@ dev = ["pytest>=8"]
 
 [project.urls]
 Homepage = "https://github.com/syyzit/docs-exec"
+Repository = "https://github.com/syyzit/docs-exec"
 Issues = "https://github.com/syyzit/docs-exec/issues"
 
 [project.scripts]
