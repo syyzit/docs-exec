@@ -1,0 +1,58 @@
+# Publish to PyPI via Trusted Publishing (OIDC) — draft, safe no-op until configured.
+#
+# Triggers:
+#   - a published GitHub Release, or
+#   - manual `workflow_dispatch` (dry-run check only, never uploads).
+#
+# Setup (maintainer, one time, on pypi.org — nothing secret goes in this repo):
+#   PyPI project Settings → Publishing → pending publisher for
+#   owner/repo `syyzit/docs-exec`, workflow `publish.yml`, environment `pypi`.
+# Until that publisher exists, the `pypi-publish` step fails closed with a
+# 403 and uploads nothing.
+#
+# Guardrail: agents must NOT upload, tag, or cut a Release unless AGLoop
+# explicitly says go. See docs/RELEASE.md.
+
+name: publish
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build sdist + wheel
+        run: |
+          python -m pip install --upgrade pip setuptools build
+          python -m build
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  pypi-publish:
+    # Real upload only on a published Release. Manual dispatches stop here
+    # so the draft can be exercised safely before PyPI trusts this repo.
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
